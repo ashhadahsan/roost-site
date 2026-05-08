@@ -1,0 +1,54 @@
+---
+import { Code } from "astro:components";
+
+const diagram = `┌────────────────┐      enqueue (in user txn)         ┌─────────────────────┐
+│  user app      │ ─────────────────────────────────► │  roost.jobs table   │
+│  (sync/async)  │                                    │  (Postgres)         │
+└────────────────┘                                    └──────────┬──────────┘
+                                                                 │ LISTEN/NOTIFY + 1s poll
+                                                                 ▼
+                                                       ┌──────────────────┐                ┌──────────────────┐
+                                                       │  roost worker    │                │  roost-web       │
+                                                       │  (process pool)  │                │  (separate pkg)  │
+                                                       └────────┬─────────┘                │  read-only +     │
+                                                                │ FOR UPDATE SKIP LOCKED   │  admin actions   │
+                                                                ▼                          └────────┬─────────┘
+                                                       ┌──────────────────┐                         ▲
+                                                       │ user job handler │                         │ SSE on
+                                                       └──────────────────┘                         │ LISTEN/NOTIFY
+                                                                                                    │
+                                                                                                    ▼
+                                                                                         same Postgres,
+                                                                                         same roost.jobs table`;
+---
+
+<section id="architecture" class="border-b border-roost-border/70 py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold tracking-tight">The whole stack is just Postgres</h2>
+    <p class="mt-3 text-roost-muted max-w-2xl">
+      One database. The same one you already run for your application. No new infra, no new failure mode.
+    </p>
+
+    <div class="mt-10 rounded-xl border border-roost-border bg-roost-card overflow-hidden">
+      <Code code={diagram} lang="text" theme="github-dark" />
+    </div>
+
+    <div class="mt-10 grid md:grid-cols-3 gap-5">
+      <div class="rounded-xl border border-roost-border bg-roost-card p-5">
+        <div class="text-roost-accent text-xs font-semibold uppercase">Concurrency primitive</div>
+        <code class="block mt-2 text-sm text-roost-fg">SELECT … FOR UPDATE SKIP LOCKED</code>
+        <p class="mt-2 text-sm text-roost-muted">Multiple workers race for rows safely. The kernel of the design.</p>
+      </div>
+      <div class="rounded-xl border border-roost-border bg-roost-card p-5">
+        <div class="text-roost-accent text-xs font-semibold uppercase">Wakeup channels</div>
+        <code class="block mt-2 text-sm text-roost-fg">LISTEN roost_inserted, roost_updated, roost_cancel_requested</code>
+        <p class="mt-2 text-sm text-roost-muted">Workers and the dashboard react in milliseconds, not on a poll cycle.</p>
+      </div>
+      <div class="rounded-xl border border-roost-border bg-roost-card p-5">
+        <div class="text-roost-accent text-xs font-semibold uppercase">State machine</div>
+        <code class="block mt-2 text-sm text-roost-fg">available → executing → completed | retryable | discarded | cancelled</code>
+        <p class="mt-2 text-sm text-roost-muted">No silent loss. Every transition is recorded; the orphan reaper covers crashed workers.</p>
+      </div>
+    </div>
+  </div>
+</section>

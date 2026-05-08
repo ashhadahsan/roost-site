@@ -1,0 +1,104 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title = "Roost — Postgres-backed background jobs for Python",
+  description = "Oban for Pythonistas. Transactional enqueue, no Redis, no RabbitMQ. Sync + async, retries, cron, unique jobs, a polished dashboard.",
+  ogImage = "/og.png",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en" class="bg-roost-bg text-roost-fg">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/logo-mark.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site).toString()} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header class="border-b border-roost-border/70 bg-roost-bg/80 backdrop-blur sticky top-0 z-20">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2 font-semibold text-roost-fg">
+          <img src="/logo-mark.svg" width="28" height="28" alt="Roost" />
+          <span>roost</span>
+        </a>
+        <nav class="flex items-center gap-5 text-sm text-roost-muted">
+          <a href="/comparison" class="hover:text-roost-fg">Compared</a>
+          <a href="/recipes" class="hover:text-roost-fg">Recipes</a>
+          <a
+            href="https://roost.readthedocs.io"
+            class="hover:text-roost-fg"
+            target="_blank"
+            rel="noreferrer">Docs</a
+          >
+          <a
+            href="https://github.com/ashhadahsan/roost"
+            class="hover:text-roost-fg"
+            target="_blank"
+            rel="noreferrer">GitHub</a
+          >
+          <a
+            href="https://github.com/ashhadahsan/roost"
+            class="ml-2 px-3 py-1.5 rounded-md bg-roost-accent text-roost-bg font-medium hover:brightness-110"
+            target="_blank"
+            rel="noreferrer">Star</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="border-t border-roost-border/70 mt-24 py-10 text-sm text-roost-muted">
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-6">
+        <div>
+          <div class="flex items-center gap-2 text-roost-fg">
+            <img src="/logo-mark.svg" width="20" height="20" alt="" />
+            <span class="font-semibold">roost</span>
+          </div>
+          <p class="mt-2">Postgres-backed background job queue for Python.</p>
+          <p class="mt-2">MIT licensed.</p>
+        </div>
+        <div>
+          <div class="text-roost-fg font-medium mb-2">Project</div>
+          <ul class="space-y-1.5">
+            <li><a class="hover:text-roost-fg" href="https://github.com/ashhadahsan/roost">roost — core</a></li>
+            <li><a class="hover:text-roost-fg" href="https://github.com/ashhadahsan/roost-web">roost-web — dashboard</a></li>
+            <li><a class="hover:text-roost-fg" href="https://roost.readthedocs.io">Read the Docs</a></li>
+            <li><a class="hover:text-roost-fg" href="https://pypi.org/project/roost/">PyPI</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-roost-fg font-medium mb-2">Site</div>
+          <ul class="space-y-1.5">
+            <li><a class="hover:text-roost-fg" href="/comparison">Comparison vs Celery / RQ / dramatiq / procrastinate</a></li>
+            <li><a class="hover:text-roost-fg" href="/recipes">Recipes</a></li>
+            <li><a class="hover:text-roost-fg" href="/#architecture">Architecture</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

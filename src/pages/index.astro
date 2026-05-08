@@ -1,17 +1,33 @@
 ---
-
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import Demo from "../components/Demo.astro";
+import Features from "../components/Features.astro";
+import Architecture from "../components/Architecture.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base>
+  <Hero />
+  <Demo />
+  <Features />
+  <Architecture />
+
+  <section class="py-24">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Built for one less piece of infra.</h2>
+      <p class="mt-4 text-roost-muted max-w-xl mx-auto">
+        Roost is alpha. Pin exactly. Star the repo, file an issue, watch the changelog.
+      </p>
+      <div class="mt-8 flex justify-center gap-3 flex-wrap">
+        <a
+          class="px-5 py-3 rounded-md bg-roost-accent text-roost-bg font-medium hover:brightness-110"
+          href="https://github.com/ashhadahsan/roost">github.com/ashhadahsan/roost</a
+        >
+        <a
+          class="px-5 py-3 rounded-md border border-roost-border bg-roost-card hover:bg-roost-surface"
+          href="https://roost.readthedocs.io">Read the Docs</a
+        >
+      </div>
+    </div>
+  </section>
+</Base>

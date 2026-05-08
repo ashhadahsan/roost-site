@@ -1,0 +1,101 @@
+---
+import Base from "../layouts/Base.astro";
+
+const rows = [
+  { feature: "Broker required", roost: "no — Postgres", celery: "Redis or RabbitMQ", rq: "Redis", dramatiq: "Redis or RabbitMQ", arq: "Redis", procrastinate: "no — Postgres", pgqueuer: "no — Postgres" },
+  { feature: "Transactional enqueue", roost: "✅ caller's conn", celery: "❌", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "✅", pgqueuer: "✅" },
+  { feature: "Sync API", roost: "✅", celery: "✅", rq: "✅", dramatiq: "✅", arq: "❌", procrastinate: "✅", pgqueuer: "❌" },
+  { feature: "Async API", roost: "✅", celery: "partial", rq: "❌", dramatiq: "❌", arq: "✅", procrastinate: "✅", pgqueuer: "✅" },
+  { feature: "FOR UPDATE SKIP LOCKED", roost: "✅", celery: "n/a", rq: "n/a", dramatiq: "n/a", arq: "n/a", procrastinate: "✅", pgqueuer: "✅" },
+  { feature: "LISTEN/NOTIFY wakeups", roost: "✅", celery: "n/a", rq: "n/a", dramatiq: "n/a", arq: "n/a", procrastinate: "✅", pgqueuer: "✅" },
+  { feature: "Cron (cluster-singleton)", roost: "✅", celery: "✅ via beat", rq: "❌ separate", dramatiq: "❌ separate", arq: "✅", procrastinate: "✅", pgqueuer: "❌" },
+  { feature: "Cron timezones", roost: "✅", celery: "✅", rq: "—", dramatiq: "—", arq: "—", procrastinate: "❌", pgqueuer: "—" },
+  { feature: "Unique jobs", roost: "✅ partial idx", celery: "via locks", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "✅", pgqueuer: "❌" },
+  { feature: "Job dependencies", roost: "✅ depends_on", celery: "via chains/groups", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Per-task rate limit", roost: "✅", celery: "✅", rq: "❌", dramatiq: "✅", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Per-task max concurrency", roost: "✅", celery: "❌", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Per-job timeout", roost: "✅", celery: "✅", rq: "✅", dramatiq: "✅", arq: "✅", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Cancel propagation", roost: "✅ via NOTIFY", celery: "via revoke", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Result storage", roost: "✅ opt-in", celery: "✅", rq: "✅", dramatiq: "✅", arq: "✅", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Worker heartbeats", roost: "✅", celery: "✅", rq: "via inspect", dramatiq: "❌", arq: "❌", procrastinate: "✅", pgqueuer: "❌" },
+  { feature: "Orphan-job reaper", roost: "✅", celery: "❌", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "✅", pgqueuer: "❌" },
+  { feature: "Pydantic-typed args", roost: "✅", celery: "❌", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Drop-in dashboard", roost: "✅ HTMX, no Node", celery: "Flower", rq: "rq-dashboard", dramatiq: "❌", arq: "❌", procrastinate: "✅ basic", pgqueuer: "❌" },
+  { feature: "JSON API", roost: "✅", celery: "❌", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "OpenTelemetry hooks", roost: "✅ extra", celery: "via plugin", rq: "❌", dramatiq: "❌", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+  { feature: "Prometheus metrics", roost: "✅ extra", celery: "via plugin", rq: "✅ exporter", dramatiq: "via mw", arq: "❌", procrastinate: "❌", pgqueuer: "❌" },
+];
+---
+
+<Base
+  title="Roost vs Celery / RQ / dramatiq / arq / procrastinate / pgqueuer"
+  description="Side-by-side feature comparison of the seven most-used Python background job queues."
+>
+  <section class="border-b border-roost-border/70 py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <a href="/" class="text-sm text-roost-muted hover:text-roost-fg">← back to home</a>
+      <h1 class="mt-4 text-4xl md:text-5xl font-bold tracking-tight">How Roost compares</h1>
+      <p class="mt-4 text-roost-muted max-w-3xl text-lg leading-relaxed">
+        Roost is one of seven background-job options for Python. The right call depends on whether you have Redis already, whether you want async-first, whether you want a transactional enqueue. This is an honest cheat-sheet — feature-by-feature, written by Roost's author.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="max-w-6xl mx-auto px-6 overflow-x-auto">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="text-left">
+            <th class="sticky left-0 bg-roost-bg px-3 py-3 border-b border-roost-border font-medium text-roost-muted text-xs uppercase tracking-wider">Feature</th>
+            <th class="px-3 py-3 border-b border-roost-border font-semibold text-roost-accent">Roost</th>
+            <th class="px-3 py-3 border-b border-roost-border font-medium text-roost-muted">Celery</th>
+            <th class="px-3 py-3 border-b border-roost-border font-medium text-roost-muted">RQ</th>
+            <th class="px-3 py-3 border-b border-roost-border font-medium text-roost-muted">dramatiq</th>
+            <th class="px-3 py-3 border-b border-roost-border font-medium text-roost-muted">arq</th>
+            <th class="px-3 py-3 border-b border-roost-border font-medium text-roost-muted">procrastinate</th>
+            <th class="px-3 py-3 border-b border-roost-border font-medium text-roost-muted">pgqueuer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r, idx) => (
+              <tr class={idx % 2 === 0 ? "bg-roost-card/40" : "bg-transparent"}>
+                <td class="sticky left-0 bg-inherit px-3 py-2.5 border-b border-roost-border/50 font-medium text-roost-fg">{r.feature}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-fg">{r.roost}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-muted">{r.celery}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-muted">{r.rq}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-muted">{r.dramatiq}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-muted">{r.arq}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-muted">{r.procrastinate}</td>
+                <td class="px-3 py-2.5 border-b border-roost-border/50 text-roost-muted">{r.pgqueuer}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="border-t border-roost-border/70 py-20">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-8">
+      <article class="rounded-xl border border-roost-border bg-roost-card p-6">
+        <h3 class="text-xl font-semibold">When to pick Roost</h3>
+        <ul class="mt-3 space-y-2 text-sm text-roost-muted">
+          <li>· You already run Postgres and don't want to add a broker.</li>
+          <li>· You need transactional enqueue — jobs that commit with your business writes.</li>
+          <li>· You want first-class async + sync without a glue layer.</li>
+          <li>· You want a dashboard that mounts in your existing app, no separate deploy.</li>
+        </ul>
+      </article>
+      <article class="rounded-xl border border-roost-border bg-roost-card p-6">
+        <h3 class="text-xl font-semibold">When to pick something else</h3>
+        <ul class="mt-3 space-y-2 text-sm text-roost-muted">
+          <li>· You don't run Postgres. Stick with Celery or RQ on Redis.</li>
+          <li>· You want a battle-tested, ten-year-old codebase. Celery wins on years-of-soak.</li>
+          <li>· You want an existing rich plugin ecosystem. Roost is alpha; Celery has decades of plugins.</li>
+          <li>· You need broker-side replay. SQS, Kafka, RabbitMQ are the right tools for that.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</Base>

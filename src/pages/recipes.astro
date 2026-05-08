@@ -1,0 +1,165 @@
+---
+import Base from "../layouts/Base.astro";
+
+const recipes = [
+  {
+    title: "FastAPI: send a welcome email transactionally",
+    body: `from fastapi import Depends, FastAPI
+from roost import AsyncRoost, job
+from roost.contrib.fastapi import tx_roost_dep
+
+@job("send_welcome_email", queue="emails", max_attempts=5)
+async def send_welcome_email(user_id: int) -> None:
+    ...
+
+app = FastAPI()
+# (open AsyncRoost in your lifespan and stash on app.state.roost)
+
+@app.post("/users")
+async def create_user(deps = Depends(tx_roost_dep)):
+    roost, conn = deps
+    user_id = await conn.fetchval("INSERT INTO users (...) VALUES (...) RETURNING id")
+    await roost.enqueue(send_welcome_email, args={"user_id": user_id}, conn=conn)
+    return {"id": user_id}`,
+  },
+  {
+    title: "Django: enqueue inside transaction.atomic()",
+    body: `from django.db import transaction
+from roost import Roost, job
+from roost.contrib.django import enqueue_in_atomic
+
+@job("resize_image", queue="images")
+def resize_image(image_id: int) -> None:
+    ...
+
+roost = Roost(settings.DATABASE_URL)
+
+def upload(request):
+    with transaction.atomic():
+        image = Image.objects.create(...)
+        enqueue_in_atomic(roost, resize_image, args={"image_id": image.id})
+    return HttpResponse("ok")`,
+  },
+  {
+    title: "Daily report at 9am Pacific (DST-aware)",
+    body: `from roost import cron
+
+@cron("0 9 * * 1-5", queue="reports", timezone="America/Los_Angeles")
+async def send_daily_digest() -> None:
+    rows = await db.fetch("SELECT * FROM events WHERE inserted_at >= now() - interval '1 day'")
+    await mailer.send_digest(rows)`,
+  },
+  {
+    title: "Fan-out → join with depends_on",
+    body: `from roost import AsyncRoost, job
+
+@job("scrape_page")
+async def scrape_page(url: str) -> dict:
+    return {"url": url, "size": ...}
+
+@job("aggregate_pages")
+async def aggregate_pages(label: str) -> None:
+    # all parents are completed by the time this runs
+    ...
+
+roost = AsyncRoost("postgresql://...")
+ids = []
+for url in urls:
+    ids.append(await roost.enqueue(scrape_page, args={"url": url}))
+await roost.enqueue(aggregate_pages, args={"label": "batch_42"}, depends_on=ids)`,
+  },
+  {
+    title: "Rate-limit outbound SMS to 100/min, max 2 in flight",
+    body: `from roost import job
+
+@job("send_sms",
+     queue="sms",
+     rate_per_minute=100,
+     max_concurrency=2,
+     timeout_seconds=15)
+async def send_sms(to: str, body: str) -> None:
+    ...`,
+  },
+  {
+    title: "Wait for a result Celery-style",
+    body: `from roost import AsyncRoost, JobFailed, JobTimeoutError
+
+@job("compute_thumbnail")
+async def compute_thumbnail(image_id: int) -> dict:
+    return {"thumb_url": ...}
+
+roost = AsyncRoost("postgresql://...")
+job_id = await roost.enqueue(compute_thumbnail, args={"image_id": 1})
+
+try:
+    outcome = await roost.wait_for(job_id, timeout=30)
+except JobTimeoutError:
+    ...
+except JobFailed as exc:
+    ...
+else:
+    print(outcome.result["thumb_url"])`,
+  },
+  {
+    title: "Mount the dashboard with the host app's auth",
+    body: `from fastapi import FastAPI, Depends
+from fastapi.responses import RedirectResponse
+from roost_web import dashboard
+
+app = FastAPI()
+
+def require_admin(request):
+    if not request.session.get("is_admin"):
+        raise HTTPException(403)
+
+# Sub-app inherits middleware; require_admin runs on every dashboard route.
+admin = dashboard(dsn="postgresql://...", read_only=False)
+app.mount("/admin/jobs", admin, dependencies=[Depends(require_admin)])`,
+  },
+  {
+    title: "Pydantic-validated args",
+    body: `from pydantic import BaseModel, Field
+from roost import job
+
+class ChargeArgs(BaseModel):
+    customer_id: int
+    amount_cents: int = Field(gt=0)
+    currency: str = "USD"
+
+@job("charge", args_model=ChargeArgs, max_attempts=3, timeout_seconds=20)
+async def charge(customer_id: int, amount_cents: int, currency: str = "USD") -> None:
+    ...
+
+# Bad args fail at handler-call time with a ValidationError recorded in errors[].
+await roost.enqueue("charge", args={"customer_id": 1, "amount_cents": 0})`,
+  },
+];
+---
+
+<Base
+  title="Roost recipes"
+  description="Concrete patterns: FastAPI, Django, scheduled jobs, fan-out, rate limiting, result-wait, auth, typed args."
+>
+  <section class="border-b border-roost-border/70 py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <a href="/" class="text-sm text-roost-muted hover:text-roost-fg">← back to home</a>
+      <h1 class="mt-4 text-4xl md:text-5xl font-bold tracking-tight">Recipes</h1>
+      <p class="mt-4 text-roost-muted max-w-3xl text-lg leading-relaxed">
+        Eight focused patterns. Copy, paste, adjust to your DSN. All examples assume the schema is applied (<code class="px-1 py-0.5 rounded bg-roost-card border border-roost-border text-roost-fg">roost init --apply</code>).
+      </p>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-4xl mx-auto px-6 space-y-10">
+      {
+        recipes.map((r) => (
+          <article>
+            <h2 class="text-xl font-semibold text-roost-fg">{r.title}</h2>
+            <pre class="shiki mt-3"><code>{r.body}</code></pre>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Base>

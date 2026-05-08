@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-roost-bg: #0b1220;
+  --color-roost-surface: #111a2c;
+  --color-roost-card: #16203a;
+  --color-roost-border: #1f2c4a;
+  --color-roost-fg: #e5ecf6;
+  --color-roost-muted: #8c97aa;
+  --color-roost-accent: #5a9bd4;
+  --color-roost-accent-2: #f2b856;
+  --color-roost-good: #6ec78f;
+  --color-roost-warn: #f2b856;
+  --color-roost-danger: #ec6b6b;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Menlo", "Consolas", ui-monospace, monospace;
+}
+
+html,
+body {
+  background: var(--color-roost-bg);
+  color: var(--color-roost-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* code highlighting hand-tuned to match the palette */
+pre.shiki,
+pre.code-block {
+  background: var(--color-roost-surface) !important;
+  border: 1px solid var(--color-roost-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-x: auto;
+}
+
+.code-comment {
+  color: var(--color-roost-muted);
+  font-style: italic;
+}
+.code-keyword {
+  color: #c084fc;
+}
+.code-string {
+  color: var(--color-roost-good);
+}
+.code-fn {
+  color: var(--color-roost-accent);
+}
+.code-num {
+  color: var(--color-roost-accent-2);
+}
+
+.hero-grid {
+  background-image:
+    radial-gradient(circle at top, rgba(90, 155, 212, 0.12), transparent 55%),
+    linear-gradient(rgba(90, 155, 212, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 155, 212, 0.06) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    40px 40px,
+    40px 40px;
+}

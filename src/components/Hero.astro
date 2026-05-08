@@ -1,0 +1,56 @@
+---
+import { Code } from "astro:components";
+
+const heroSnippet = `# inside a FastAPI request — same transaction as user.create
+async with pool.acquire() as conn, conn.transaction():
+    user_id = await conn.fetchval("INSERT INTO users …")
+    await roost.enqueue(send_welcome, args={"user_id": user_id}, conn=conn)
+    #                                                          ^^^^^^^^^
+    # both rows commit together — or roll back together
+`;
+---
+
+<section class="relative overflow-hidden hero-grid border-b border-roost-border/70">
+  <div class="max-w-6xl mx-auto px-6 pt-24 pb-28 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-roost-card/80 border border-roost-border text-xs text-roost-muted">
+        <span class="w-1.5 h-1.5 rounded-full bg-roost-accent animate-pulse"></span>
+        v0.1 alpha — pin exactly
+      </div>
+      <h1 class="mt-6 text-4xl md:text-5xl font-bold leading-[1.1] tracking-tight">
+        Postgres-backed background jobs for Python.
+        <span class="block text-roost-muted text-2xl md:text-3xl mt-3 font-medium">
+          One less piece of infra. Real transactions. Polished dashboard.
+        </span>
+      </h1>
+      <p class="mt-6 text-lg text-roost-muted max-w-lg">
+        Roost is Oban for Pythonistas. Insert a job in the same transaction as your business writes — they commit or roll back together. No Redis. No RabbitMQ. No Celery boilerplate.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a
+          href="https://github.com/ashhadahsan/roost#quickstart"
+          class="px-5 py-3 rounded-md bg-roost-accent text-roost-bg font-medium hover:brightness-110 transition"
+          target="_blank"
+          rel="noreferrer">Get started</a
+        >
+        <a
+          href="/comparison"
+          class="px-5 py-3 rounded-md border border-roost-border bg-roost-card hover:bg-roost-surface transition"
+          >Compared to Celery / RQ / procrastinate →</a
+        >
+      </div>
+      <div class="mt-6 text-sm text-roost-muted">
+        <code class="px-2 py-1 rounded bg-roost-card border border-roost-border text-roost-fg">pip install roost</code>
+        <span class="mx-2">·</span>
+        <code class="px-2 py-1 rounded bg-roost-card border border-roost-border text-roost-fg">pip install roost-web</code>
+      </div>
+    </div>
+    <div class="relative">
+      <div class="absolute -inset-4 bg-roost-accent/20 blur-2xl rounded-3xl"></div>
+      <div class="relative rounded-xl border border-roost-border bg-roost-surface overflow-hidden">
+        <div class="px-4 py-2 border-b border-roost-border text-xs uppercase tracking-wider text-roost-muted">python · fastapi</div>
+        <Code code={heroSnippet} lang="python" theme="github-dark" />
+      </div>
+    </div>
+  </div>
+</section>

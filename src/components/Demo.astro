@@ -1,0 +1,59 @@
+---
+import { Code } from "astro:components";
+
+const initSnippet = `$ pip install roost
+$ roost init --apply --dsn postgresql://...
+schema applied to postgresql://...`;
+
+const taskSnippet = `# tasks.py
+from roost import job
+
+@job("send_welcome_email", max_attempts=5)
+async def send_welcome_email(user_id: int) -> None:
+    ...`;
+
+const runSnippet = `$ roost run --module tasks \\
+            --queues default \\
+            --concurrency 8`;
+
+const dashSnippet = `from fastapi import FastAPI
+from roost_web import dashboard
+
+app = FastAPI()
+app.mount("/jobs", dashboard(dsn="postgresql://..."))
+# That's it. Live updates via SSE, retry/cancel buttons, no Node.js.`;
+---
+
+<section id="demo" class="border-b border-roost-border/70 py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Three steps to your first job</h2>
+    <p class="mt-3 text-roost-muted max-w-2xl">
+      No broker. No worker harness to write. The schema is one SQL file. The worker is one CLI command.
+    </p>
+
+    <div class="mt-12 grid md:grid-cols-3 gap-6">
+      <div class="rounded-xl border border-roost-border bg-roost-card overflow-hidden">
+        <div class="px-5 py-3 border-b border-roost-border bg-roost-surface text-xs uppercase tracking-wider text-roost-muted">1. Apply the schema</div>
+        <Code code={initSnippet} lang="bash" theme="github-dark" />
+      </div>
+
+      <div class="rounded-xl border border-roost-border bg-roost-card overflow-hidden">
+        <div class="px-5 py-3 border-b border-roost-border bg-roost-surface text-xs uppercase tracking-wider text-roost-muted">2. Define a task</div>
+        <Code code={taskSnippet} lang="python" theme="github-dark" />
+      </div>
+
+      <div class="rounded-xl border border-roost-border bg-roost-card overflow-hidden">
+        <div class="px-5 py-3 border-b border-roost-border bg-roost-surface text-xs uppercase tracking-wider text-roost-muted">3. Run a worker</div>
+        <Code code={runSnippet} lang="bash" theme="github-dark" />
+      </div>
+    </div>
+
+    <div class="mt-10 rounded-xl border border-roost-border bg-roost-card overflow-hidden">
+      <div class="flex items-center gap-2 px-5 py-3 border-b border-roost-border bg-roost-surface text-sm text-roost-muted">
+        <span class="w-2 h-2 rounded-full bg-roost-good"></span>
+        Bonus: drop-in dashboard for free.
+      </div>
+      <Code code={dashSnippet} lang="python" theme="github-dark" />
+    </div>
+  </div>
+</section>

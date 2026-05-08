@@ -1,43 +1,56 @@
-# Astro Starter Kit: Minimal
+# roost-site
 
-```sh
-npm create astro@latest -- --template minimal
+Marketing site for [Roost](https://github.com/ashhadahsan/roost) — the Postgres-backed background job queue for Python.
+
+Static. Astro 6 + Tailwind 4. ~100KB total bundle. Deploys anywhere that serves files.
+
+## Local
+
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # static output in dist/
+npm run preview  # preview the prod build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Pages
 
-## 🚀 Project Structure
+- `/` — landing (hero, demo, features, architecture)
+- `/comparison` — Roost vs Celery / RQ / dramatiq / arq / procrastinate / pgqueuer
+- `/recipes` — eight focused patterns (FastAPI / Django / cron / chaining / rate limit / wait / auth / typed args)
 
-Inside of your Astro project, you'll see the following folders and files:
+## Deploy
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+### Cloudflare Pages (recommended)
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name=roost-site
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Or connect this repo to Cloudflare Pages with build command `npm run build` and output directory `dist`.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### Vercel / Netlify
 
-Any static assets, like images, can be placed in the `public/` directory.
+Build command `npm run build`, output directory `dist`, Node 22+.
 
-## 🧞 Commands
+## Structure
 
-All commands are run from the root of the project, from a terminal:
+```
+src/
+├── layouts/Base.astro        # navbar + footer + meta tags
+├── components/
+│   ├── Hero.astro            # hero + code teaser
+│   ├── Demo.astro            # 3-step quickstart
+│   ├── Features.astro        # 9-card feature grid
+│   └── Architecture.astro    # ASCII diagram + 3 primitives
+├── pages/
+│   ├── index.astro
+│   ├── comparison.astro
+│   └── recipes.astro
+└── styles/global.css         # @theme tokens + code block hand-tuning
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## License
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+MIT.
