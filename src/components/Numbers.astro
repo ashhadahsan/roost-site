@@ -1,0 +1,31 @@
+---
+const stats = [
+  { value: "15k", unit: "jobs / sec", label: "Bulk enqueue throughput", note: "single async connection" },
+  { value: "822", unit: "jobs / sec", label: "Sustained dispatch", note: "16 workers, local Postgres, noop handler" },
+  { value: "3 ms", unit: "p50", label: "Per-job dispatch overhead", note: "p99 51 ms" },
+  { value: "85", unit: "tests", label: "On Postgres 13–16 × Python 3.10–3.13", note: "ruff + mypy strict on every commit" },
+];
+---
+
+<section class="border-b border-roost-border/70 py-20">
+  <div class="max-w-6xl mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Real numbers from a laptop</h2>
+    <p class="mt-3 text-roost-muted max-w-2xl">
+      No staged demo. <code class="px-1 py-0.5 rounded bg-roost-card border border-roost-border text-roost-fg">bench/throughput.py</code> in the repo, run on a single MacBook against local Postgres 16. Your mileage on dedicated infra is higher.
+    </p>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {
+        stats.map((s) => (
+          <article class="rounded-xl border border-roost-border bg-roost-card p-6">
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-roost-accent">{s.value}</span>
+              <span class="text-sm text-roost-muted">{s.unit}</span>
+            </div>
+            <div class="mt-3 font-medium text-roost-fg">{s.label}</div>
+            <div class="mt-1 text-xs text-roost-muted">{s.note}</div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
