@@ -52,8 +52,17 @@ app.mount("/jobs", dashboard(dsn="postgresql://..."))
       <div class="flex items-center gap-2 px-5 py-3 border-b border-roost-border bg-roost-surface text-sm text-roost-muted">
         <span class="w-2 h-2 rounded-full bg-roost-good"></span>
         Bonus: drop-in dashboard for free.
+        <a class="ml-auto whitespace-nowrap text-roost-accent hover:underline" href="https://github.com/ashhadahsan/roost-web">roost-web →</a>
       </div>
       <Code code={dashSnippet} lang="python" theme="github-dark" />
+      <div class="grid md:grid-cols-2 gap-4 p-4 border-t border-roost-border bg-roost-surface">
+        <a href="https://github.com/ashhadahsan/roost-web">
+          <img class="w-full h-auto rounded-lg border border-roost-border" src="/dashboard-overview.png" width="2880" height="1800" loading="lazy" decoding="async" alt="roost-web overview: live counters per queue and state, completed jobs per minute, running workers" />
+        </a>
+        <a href="https://github.com/ashhadahsan/roost-web">
+          <img class="w-full h-auto rounded-lg border border-roost-border" src="/dashboard-jobs.png" width="2880" height="1800" loading="lazy" decoding="async" alt="roost-web jobs list with filters by state, queue, task, tag and args, and bulk retry and cancel" />
+        </a>
+      </div>
     </div>
   </div>
 </section>
